@@ -10,9 +10,9 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func Unpack(str string) (string, error) {
-	var res strings.Builder
 	var prev rune
 	var prevS string
+	var res strings.Builder
 
 	for _, cur := range str {
 		prevS = string(prev)
