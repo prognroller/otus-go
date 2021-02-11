@@ -49,8 +49,85 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
-	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+	t.Run("purge set logic", func(t *testing.T) {
+		tests := []struct {
+			key Key
+			val interface{}
+		}{
+			{key: "a", val: 1},
+			{key: "b", val: 2},
+			{key: "c", val: 3},
+			{key: "d", val: 4},
+		}
+
+		cache := NewCache(3)
+
+		for _, pair := range tests {
+			cache.Set(pair.key, pair.val)
+		}
+
+		for i := 3; i > 0; i-- {
+			_, ok := cache.Get(tests[i].key)
+			require.True(t, ok)
+		}
+
+		_, ok := cache.Get("a")
+		require.False(t, ok)
+	})
+
+	t.Run("purge set/get logic", func(t *testing.T) {
+		tests := []struct {
+			key Key
+			val interface{}
+		}{
+			{key: "a", val: 1},
+			{key: "b", val: 2},
+			{key: "c", val: 3},
+		}
+		expectedKeys := []Key{"a", "c", "d"}
+
+		cache := NewCache(3)
+
+		for i := 0; i < len(tests); i++ {
+			cache.Set(tests[i].key, tests[i].val)
+		}
+
+		cache.Get("a")
+		cache.Get("b")
+		cache.Set("c", 33)
+		cache.Get("a")
+
+		cache.Set("d", 4)
+
+		for _, k := range expectedKeys {
+			_, ok := cache.Get(k)
+			require.True(t, ok)
+		}
+
+		_, ok := cache.Get("b")
+		require.False(t, ok)
+	})
+
+	t.Run("Clear", func(t *testing.T) {
+		tests := []struct {
+			key Key
+			val interface{}
+		}{
+			{key: "a", val: 1},
+			{key: "b", val: 2},
+		}
+		c := NewCache(2)
+
+		for _, k := range tests {
+			c.Set(k.key, k.val)
+		}
+
+		c.Clear()
+
+		for _, k := range tests {
+			_, ok := c.Get(k.key)
+			require.False(t, ok)
+		}
 	})
 }
 
