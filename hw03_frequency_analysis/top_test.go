@@ -7,7 +7,7 @@ import (
 )
 
 // Change to true if needed.
-var taskWithAsteriskIsCompleted = false
+var taskWithAsteriskIsCompleted = true
 
 var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
@@ -44,9 +44,21 @@ var text = `Как видите, он  спускается  по  лестни�
 		В этот вечер...`
 
 func TestTop10(t *testing.T) {
-	t.Run("no words in empty string", func(t *testing.T) {
-		require.Len(t, Top10(""), 0)
-	})
+	emptyStringTests := []struct {
+		name string
+		text string
+	}{
+		{name: "Empty string", text: ""},
+		{name: "Whitespace", text: " "},
+		{name: "Whitespace symbols", text: "\r\t\n"},
+		{name: "Punctuation", text: ".\r,\t;\n!?\"'"},
+	}
+
+	for _, r := range emptyStringTests {
+		t.Run(r.name, func(t *testing.T) {
+			require.Len(t, Top10(r.text), 0)
+		})
+	}
 
 	t.Run("positive test", func(t *testing.T) {
 		if taskWithAsteriskIsCompleted {
