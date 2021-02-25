@@ -13,6 +13,29 @@ import (
 )
 
 func TestRun(t *testing.T) {
+	var tasks []Task
+
+	tasks = append(tasks, func() error { return nil })
+
+	wrongParamsTests := []struct {
+		testName            string
+		f                   []Task
+		numTasks, numErrors int
+	}{
+		{f: tasks, numTasks: 0, numErrors: 1, testName: "Zero number of tasks"},
+		{f: tasks, numTasks: -10, numErrors: 1, testName: "Negative number of tasks"},
+		{f: tasks, numTasks: 1, numErrors: 0, testName: "Zero number of errors"},
+		{f: tasks, numTasks: 1, numErrors: -3, testName: "Negative number of errors"},
+		{f: []Task{}, numTasks: 1, numErrors: 1, testName: "No functions"},
+	}
+
+	for _, errTest := range wrongParamsTests {
+		t.Run(errTest.testName, func(t *testing.T) {
+			err := Run(errTest.f, errTest.numTasks, errTest.numErrors)
+			require.Error(t, err)
+		})
+	}
+
 	defer goleak.VerifyNone(t)
 
 	t.Run("if were errors in first M tasks, than finished not more N+M tasks", func(t *testing.T) {
