@@ -36,6 +36,12 @@ func TestPipeline(t *testing.T) {
 		g("Stringifier", func(v interface{}) interface{} { return strconv.Itoa(v.(int)) }),
 	}
 
+	t.Run("passed empty In channel", func(t *testing.T) {
+		res := ExecutePipeline(nil, nil, stages...)
+
+		require.Nil(t, res)
+	})
+
 	t.Run("simple case", func(t *testing.T) {
 		in := make(Bi)
 		data := []int{1, 2, 3, 4, 5}
